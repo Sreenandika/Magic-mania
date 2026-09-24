@@ -111,8 +111,8 @@ export class GameScene extends Phaser.Scene {
     this.beamGraphics = this.add.graphics();
     this.objectsGroup = this.physics.add.group();
 
-    // 4. Create Subway Hero Runner
-    this.hero = new SubwayHero(this, TrackEnvironmentManager.LANE_X[1], height - 140);
+    // 4. Create Subway Hero Runner (Positioned at bottom-center of third-person track)
+    this.hero = new SubwayHero(this, TrackEnvironmentManager.LANE_X[1], 590);
 
     // Collision setup
     this.physics.add.overlap(
@@ -148,181 +148,137 @@ export class GameScene extends Phaser.Scene {
     const height = this.cameras.main.height;
 
     // ═══════════════════════════════════════════════════════
-    // 🔘 TOP UI NAVIGATION & OVERLAY CONTROLS (With Margins)
+    // 🔘 TOP-LEFT: MODERN SQUARE DARK GLASS PAUSE & SOUND BUTTONS (Exact Match to Target)
     // ═══════════════════════════════════════════════════════
-
-    // Top-Left: ◄ MENU / EXIT Button & Top-Right: ⏸️ PAUSE Button
-    const createNavButton = (bx: number, by: number, label: string, colorHex: number, strokeHex: string, callback: () => void) => {
-      const bw = 120;
-      const bh = 42;
-
-      const btnRect = this.add.rectangle(bx, by, bw, bh, 0x0f172a, 0.95)
-        .setStrokeStyle(2, colorHex, 0.9)
-        .setInteractive({ useHandCursor: true })
-        .setDepth(50);
-
-      const btnText = this.add.text(bx, by, label, {
-        fontFamily: 'Orbitron',
-        fontSize: '14px',
-        color: strokeHex
-      }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(51);
-
-      const trigger = () => {
-        callback();
-      };
-
-      btnRect.on('pointerover', () => {
-        btnRect.setFillStyle(colorHex, 0.95);
-        btnText.setColor('#ffffff');
-      });
-
-      btnText.on('pointerover', () => {
-        btnRect.setFillStyle(colorHex, 0.95);
-        btnText.setColor('#ffffff');
-      });
-
-      btnRect.on('pointerout', () => {
-        btnRect.setFillStyle(0x0f172a, 0.95);
-        btnText.setColor(strokeHex);
-      });
-
-      btnText.on('pointerout', () => {
-        btnRect.setFillStyle(0x0f172a, 0.95);
-        btnText.setColor(strokeHex);
-      });
-
-      btnRect.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
-        if (event) event.stopPropagation();
-        trigger();
-      });
-
-      btnText.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
-        if (event) event.stopPropagation();
-        trigger();
-      });
-    };
-
-    // Exit Button (Top-Left)
-    createNavButton(75, 35, '◄ MENU', 0xff0077, '#ff0077', () => this.exitToMenu());
-
-    // Sound Button (Top-Right-ish)
-    const audioMgr = AudioManager.getInstance();
-    const soundBtnText = audioMgr.isSoundMuted() ? '🔇 MUTED' : '🔊 SOUND';
-    createNavButton(width - 205, 35, soundBtnText, 0x00f0ff, '#00f0ff', () => {
-      const muted = audioMgr.toggleMute();
-      this.scene.restart({ levelId: this.levelId });
-    });
-
-    // Pause Button (Top-Right)
-    createNavButton(width - 75, 35, '⏸️ PAUSE', 0x00f0ff, '#00f0ff', () => this.togglePause());
-
-    // Top-Center: Prominent Level Indicator Badge
-    const levelBadgeW = 180;
-    const levelBadgeH = 42;
-    const levelBadgeX = width / 2;
-    const levelBadgeY = 35;
-
-    const levelBadgeBg = this.add.rectangle(levelBadgeX, levelBadgeY, levelBadgeW, levelBadgeH, 0x0f172a, 0.95)
-      .setStrokeStyle(2, 0x00f0ff, 0.95)
+    const pauseBtn = this.add.rectangle(45, 45, 44, 44, 0x0f172a, 0.95)
+      .setStrokeStyle(2, 0x38bdf8, 0.9)
+      .setInteractive({ useHandCursor: true })
       .setDepth(50);
 
-    const levelBadgeG = this.add.graphics().setDepth(50);
-    levelBadgeG.fillStyle(0x00f0ff, 0.15);
-    levelBadgeG.fillRoundedRect(levelBadgeX - levelBadgeW / 2 + 2, levelBadgeY - levelBadgeH / 2 + 2, levelBadgeW - 4, levelBadgeH / 2 - 2, 6);
+    const pauseIcon = this.add.text(45, 45, '⏸', {
+      fontFamily: 'Orbitron',
+      fontSize: '20px',
+      color: '#00f0ff'
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(51);
 
-    this.add.text(levelBadgeX, levelBadgeY - 6, `LEVEL ${this.levelId}`, {
+    pauseBtn.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+      if (event) event.stopPropagation();
+      this.togglePause();
+    });
+
+    pauseIcon.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+      if (event) event.stopPropagation();
+      this.togglePause();
+    });
+
+    // Sound Mute Toggle Button next to Pause
+    const audioMgr = AudioManager.getInstance();
+    const soundBtnBg = this.add.rectangle(105, 45, 44, 44, 0x0f172a, 0.95)
+      .setStrokeStyle(2, 0x38bdf8, 0.9)
+      .setInteractive({ useHandCursor: true })
+      .setDepth(50);
+
+    const soundBtnText = this.add.text(105, 45, audioMgr.isSoundMuted() ? '🔇' : '🔊', {
+      fontFamily: 'Orbitron',
+      fontSize: '18px',
+      color: '#00f0ff'
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(51);
+
+    soundBtnBg.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+      if (event) event.stopPropagation();
+      const muted = audioMgr.toggleMute();
+      soundBtnText.setText(muted ? '🔇' : '🔊');
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // 📊 TOP-RIGHT: SCORE, MULTIPLIER & COINS BADGES (Exact Match to Target)
+    // ═══════════════════════════════════════════════════════
+    const trY = 42;
+
+    // Multiplier Badge 'x1'
+    const multBg = this.add.rectangle(width - 170, trY, 44, 38, 0x0f172a, 0.95)
+      .setStrokeStyle(1.5, 0xf59e0b, 0.85)
+      .setDepth(50);
+    this.add.text(width - 170, trY, 'x1', {
       fontFamily: 'Orbitron',
       fontSize: '16px',
-      color: '#ffffff',
-      stroke: '#00f0ff',
-      strokeThickness: 2
+      color: '#f59e0b'
     }).setOrigin(0.5).setDepth(51);
 
-    this.add.text(levelBadgeX, levelBadgeY + 11, `${this.envInfo.themeName.toUpperCase()}`, {
-      fontFamily: 'Inter',
-      fontSize: '9px',
-      color: '#38bdf8'
+    // Score Badge '000568'
+    const scoreBg = this.add.rectangle(width - 75, trY, 120, 38, 0x0f172a, 0.95)
+      .setStrokeStyle(1.5, 0xffffff, 0.85)
+      .setDepth(50);
+    this.scoreText = this.add.text(width - 75, trY, '000000', {
+      fontFamily: 'Orbitron',
+      fontSize: '18px',
+      color: '#ffffff'
+    }).setOrigin(0.5).setDepth(51);
+
+    // Coins Badge '18 🪙'
+    const coinBg = this.add.rectangle(width - 75, trY + 44, 120, 34, 0x0f172a, 0.95)
+      .setStrokeStyle(1.5, 0xf59e0b, 0.85)
+      .setDepth(50);
+    this.coinsText = this.add.text(width - 75, trY + 44, '0 🪙', {
+      fontFamily: 'Orbitron',
+      fontSize: '16px',
+      color: '#f59e0b'
     }).setOrigin(0.5).setDepth(51);
 
     // ═══════════════════════════════════════════════════════
-    // 📊 BOTTOM RUNNER HUD PANEL
+    // ❤️ BOTTOM-LEFT: LIVES CAPSULE BADGE (Exact Match to Target)
     // ═══════════════════════════════════════════════════════
-    const hudY = height - 78;
+    const blY = height - 60;
+    const livesBadge = this.add.graphics().setDepth(50);
+    livesBadge.fillStyle(0x0f172a, 0.92);
+    livesBadge.lineStyle(2, 0x38bdf8, 0.9);
+    livesBadge.fillRoundedRect(24, blY - 32, 130, 56, 12);
+    livesBadge.strokeRoundedRect(24, blY - 32, 130, 56, 12);
 
-    // Glassmorphic Cyber Bottom HUD Panel
-    const hudPanel = this.add.graphics();
-    hudPanel.fillStyle(0x090d16, 0.92);
-    hudPanel.lineStyle(2, 0x00f0ff, 0.9);
-    hudPanel.fillRoundedRect(12, hudY, width - 24, 66, 14);
-    hudPanel.strokeRoundedRect(12, hudY, width - 24, 66, 14);
-
-    // Inner Specular Accent Line
-    hudPanel.lineStyle(1, 0xffffff, 0.35);
-    hudPanel.strokeRoundedRect(14, hudY + 2, width - 28, 62, 12);
-
-    // Bottom-Left: ❤️ Lives Badge Container
-    const livesBadge = this.add.graphics();
-    livesBadge.fillStyle(0x1e1b4b, 0.9);
-    livesBadge.lineStyle(1.5, 0xff0077, 0.8);
-    livesBadge.fillRoundedRect(22, hudY + 8, 110, 48, 10);
-    livesBadge.strokeRoundedRect(22, hudY + 8, 110, 48, 10);
-
-    this.add.text(77, hudY + 18, 'LIVES', {
-      fontFamily: 'Orbitron',
-      fontSize: '10px',
-      color: '#ff0077'
-    }).setOrigin(0.5);
-
-    this.livesContainer = this.add.container(77, hudY + 38);
-    this.updateLivesDisplay();
-
-    // Bottom-Center: 🏁 Mission Progress Header Bar
-    this.add.text(width / 2, hudY + 14, `MISSION ${this.levelId}: ${this.envInfo.themeName}`, {
-      fontFamily: 'Orbitron',
-      fontSize: '12px',
-      color: '#00f0ff'
-    }).setOrigin(0.5);
-
-    this.distanceProgressBar = this.add.graphics();
-    this.distancePercentText = this.add.text(width / 2, hudY + 36, '0% FINISH', {
+    this.add.text(89, blY - 20, 'LIVES', {
       fontFamily: 'Orbitron',
       fontSize: '11px',
+      color: '#94a3b8'
+    }).setOrigin(0.5).setDepth(51);
+
+    this.livesContainer = this.add.container(89, blY + 4).setDepth(51);
+    this.updateLivesDisplay();
+
+    // ═══════════════════════════════════════════════════════
+    // 🏁 BOTTOM-CENTER: MISSION PROGRESS BAR (Exact Match to Target)
+    // ═══════════════════════════════════════════════════════
+    const bcX = width / 2;
+    const bcY = height - 42;
+
+    const missionCard = this.add.graphics().setDepth(50);
+    missionCard.fillStyle(0x0f172a, 0.92);
+    missionCard.lineStyle(2, 0x00f0ff, 0.9);
+    missionCard.fillRoundedRect(bcX - 190, bcY - 28, 380, 52, 12);
+    missionCard.strokeRoundedRect(bcX - 190, bcY - 28, 380, 52, 12);
+
+    this.add.text(bcX, bcY - 14, `MISSION ${this.levelId} - COLLECT ${this.requiredCoins} COINS`, {
+      fontFamily: 'Orbitron',
+      fontSize: '12px',
       color: '#ffffff'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(51);
+
+    this.distanceProgressBar = this.add.graphics().setDepth(51);
+    this.distancePercentText = this.add.text(bcX, bcY + 8, '0 / 100', {
+      fontFamily: 'Orbitron',
+      fontSize: '11px',
+      color: '#38bdf8'
+    }).setOrigin(0.5).setDepth(52);
 
     this.updateDistanceBar();
 
-    // Bottom-Right: ⭐ Score & 🪙 Coins Glass Badges
-    const scoreBadge = this.add.graphics();
-    scoreBadge.fillStyle(0x1e1b4b, 0.9);
-    scoreBadge.lineStyle(1.5, 0xf59e0b, 0.8);
-    scoreBadge.fillRoundedRect(width - 250, hudY + 8, 225, 48, 10);
-    scoreBadge.strokeRoundedRect(width - 250, hudY + 8, 225, 48, 10);
-
-    this.scoreText = this.add.text(width - 238, hudY + 15, `⭐ SCORE: ${this.score}`, {
+    // Floating Controls Prompt
+    this.rejectPromptText = this.add.text(bcX, bcY - 42, '⚡ ◀ ▶ / A D TO DODGE | SPACEBAR / TAP TO REPEL! ⚡', {
       fontFamily: 'Orbitron',
-      fontSize: '15px',
-      color: '#ffb700'
-    });
-
-    this.coinsText = this.add.text(width - 238, hudY + 36, `🪙 COINS: ${this.coinsCollected}`, {
-      fontFamily: 'Inter',
-      fontSize: '12px',
-      color: '#38bdf8'
-    });
-
-    // Magnet Power Gauge Meter
-    this.powerBarGraphics = this.add.graphics();
-    this.updatePowerBar();
-
-    // Dynamic SPACEBAR / TAP TO REJECT HAZARD Prompt (Floating Above Bottom HUD)
-    this.rejectPromptText = this.add.text(width / 2, hudY - 22, '⚡ PRESS SPACEBAR / TAP TO REJECT & BLAST BOMBS! ⚡', {
-      fontFamily: 'Orbitron',
-      fontSize: '12px',
+      fontSize: '11px',
       color: '#00f0ff',
       stroke: '#05070e',
       strokeThickness: 3
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(50);
 
     this.tweens.add({
       targets: this.rejectPromptText,
@@ -332,7 +288,6 @@ export class GameScene extends Phaser.Scene {
       repeat: -1
     });
 
-    // Keyboard ESC toggle pause shortcut
     if (this.input.keyboard) {
       this.input.keyboard.on('keydown-ESC', () => this.togglePause());
     }
@@ -504,23 +459,24 @@ export class GameScene extends Phaser.Scene {
   private updateDistanceBar(): void {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
-    const hudY = height - 78;
-    const barX = width / 2 - 130;
-    const barY = hudY + 28;
-    const barW = 260;
-    const barH = 14;
+    const bcX = width / 2;
+    const bcY = height - 42;
+    const barX = bcX - 160;
+    const barY = bcY + 2;
+    const barW = 320;
+    const barH = 10;
 
     this.distanceProgressBar.clear();
     this.distanceProgressBar.fillStyle(0x0f172a, 1);
-    this.distanceProgressBar.fillRoundedRect(barX, barY, barW, barH, 5);
+    this.distanceProgressBar.fillRoundedRect(barX, barY, barW, barH, 4);
 
     const ratio = Phaser.Math.Clamp(this.runDistance / this.targetDistance, 0, 1);
     this.distanceProgressBar.fillStyle(0x00f0ff, 1);
-    this.distanceProgressBar.fillRoundedRect(barX, barY, barW * ratio, barH, 5);
+    this.distanceProgressBar.fillRoundedRect(barX, barY, barW * ratio, barH, 4);
     this.distanceProgressBar.lineStyle(1.5, 0x00f0ff, 0.9);
-    this.distanceProgressBar.strokeRoundedRect(barX, barY, barW, barH, 5);
+    this.distanceProgressBar.strokeRoundedRect(barX, barY, barW, barH, 4);
 
-    this.distancePercentText.setText(`${Math.floor(ratio * 100)}% FINISH`);
+    this.distancePercentText.setText(`${this.coinsCollected} / ${this.requiredCoins}`);
   }
 
   private updatePowerBar(): void {
@@ -752,8 +708,8 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    this.scoreText.setText(`⭐ SCORE: ${Math.floor(this.score)}`);
-    this.coinsText.setText(`🪙 COINS: ${this.coinsCollected}`);
+    this.scoreText.setText(String(Math.floor(this.score)).padStart(6, '0'));
+    this.coinsText.setText(`${this.coinsCollected} 🪙`);
 
     // Immediate cleanup from physics body, rendering canvas, and active array
     if (obj.body) {
