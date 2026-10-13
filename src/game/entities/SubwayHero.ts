@@ -21,20 +21,23 @@ export class SubwayHero extends Phaser.GameObjects.Container {
   private runFrameIndex: number = 0;
   private isPulseActive: boolean = false;
   private pulseCooldown: number = 0;
+  private baseY: number = 580;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y);
+    this.baseY = y;
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.body.setCircle(24, -24, -24);
+    this.setScale(1.4); // Prominent human runner in foreground (~20% screen height)
+    this.body.setCircle(28, -28, -28);
     this.body.setCollideWorldBounds(true);
 
     // 1. 3D Shield Aura Graphic
     this.shieldAura = scene.add.sprite(0, 0, 'shield_aura').setVisible(false).setScale(1.2);
     this.add(this.shieldAura);
 
-    // 2. 3D HUMAN RUNNER SPRITE (VIEWED FROM BEHIND IN 3RD PERSON)
+    // 2. 3D HUMAN RUNNER SPRITE ON FOOT (VIEWED FROM BEHIND - ZERO SKATEBOARD)
     this.heroSprite = scene.add.sprite(0, 0, 'hero_run1');
     this.add(this.heroSprite);
 
@@ -54,8 +57,26 @@ export class SubwayHero extends Phaser.GameObjects.Container {
 
     // MAGNETIC REPEL PULSE (SPACEBAR / CLICK TAP)
     k.on('keydown-SPACE', () => this.triggerRepelPulse());
+
+    // Swipe gesture support for mobile/touch responsiveness
+    let startX = 0;
+    let startY = 0;
     this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.y > 60 && !(this.scene as any).isPaused) {
+      startX = pointer.x;
+      startY = pointer.y;
+    });
+
+    this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      const diffX = pointer.x - startX;
+      const diffY = pointer.y - startY;
+
+      if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX < 0) {
+          this.moveLane(-1);
+        } else {
+          this.moveLane(1);
+        }
+      } else if (pointer.y > 60 && !(this.scene as any).isPaused) {
         this.triggerRepelPulse();
       }
     });
@@ -67,13 +88,23 @@ export class SubwayHero extends Phaser.GameObjects.Container {
 
     this.currentLane = targetLane;
     const targetX = TrackEnvironmentManager.LANE_X[this.currentLane];
+    const tiltAngle = dir * 0.16;
 
-    // Smooth lane switch tween
+    // Dynamic lane switch tween with organic body tilt
     this.scene.tweens.add({
       targets: this,
       x: targetX,
-      duration: 160,
-      ease: 'Quad.easeOut'
+      rotation: tiltAngle,
+      duration: 120,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        this.scene.tweens.add({
+          targets: this,
+          rotation: 0,
+          duration: 90,
+          ease: 'Quad.easeIn'
+        });
+      }
     });
   }
 
@@ -84,8 +115,8 @@ export class SubwayHero extends Phaser.GameObjects.Container {
     this.pulseCooldown = 700; // 700ms cooldown between pulses
     this.heroSprite.setTexture('hero_pulse');
 
-    // Create expanding shockwave pulse visual
-    const shockwave = this.scene.add.sprite(this.x, this.y, 'pulse_shockwave').setDepth(10);
+    // Create expanding shockwave pulse visual ahead down the track
+    const shockwave = this.scene.add.sprite(this.x, this.y - 20, 'pulse_shockwave').setDepth(10);
     this.scene.tweens.add({
       targets: shockwave,
       scaleX: 3.5,
@@ -117,10 +148,14 @@ export class SubwayHero extends Phaser.GameObjects.Container {
       this.shieldAura.setVisible(false);
     }
 
-    // 🏃 4-FRAME 3RD-PERSON HUMAN RUNNER ANIMATION LOOP
+    // 🏃 Organic Running Step Bounce on foot
+    const stepBounce = Math.abs(Math.sin(time * 0.014)) * 3.5;
+    this.y = this.baseY - stepBounce;
+
+    // 🏃 4-FRAME ON-FOOT HUMAN RUNNER ANIMATION LOOP
     if (!this.isPulseActive) {
       this.animTimer += delta;
-      if (this.animTimer > 120) {
+      if (this.animTimer > 110) {
         this.animTimer = 0;
         this.runFrameIndex = (this.runFrameIndex + 1) % 4;
         const keys = ['hero_run1', 'hero_run2', 'hero_run3', 'hero_run4'];
@@ -129,5 +164,3 @@ export class SubwayHero extends Phaser.GameObjects.Container {
     }
   }
 }
-
-

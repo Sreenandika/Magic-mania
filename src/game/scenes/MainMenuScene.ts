@@ -95,7 +95,7 @@ export class MainMenuScene extends Phaser.Scene {
     subCard.fillRoundedRect(titleX - 220, titleY + 40, 440, 32, 8);
     subCard.strokeRoundedRect(titleX - 220, titleY + 40, 440, 32, 8);
 
-    this.add.text(titleX, titleY + 56, '3D CYBERNETIC MAGNETIC ARCADE', {
+    this.add.text(titleX, titleY + 56, '3D URBAN ENDLESS RUNNER', {
       fontFamily: 'Orbitron',
       fontSize: '13px',
       color: '#ff0077',
