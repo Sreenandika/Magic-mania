@@ -148,17 +148,17 @@ export class GameScene extends Phaser.Scene {
     const height = this.cameras.main.height;
 
     // ═══════════════════════════════════════════════════════
-    // 🔘 TOP-LEFT: MODERN SQUARE DARK GLASS PAUSE & SOUND BUTTONS (Exact Match to Target)
+    // 🔘 TOP-LEFT: MODERN SQUARE PAUSE & SOUND BUTTONS (DAYTIME PALETTE)
     // ═══════════════════════════════════════════════════════
-    const pauseBtn = this.add.rectangle(45, 45, 44, 44, 0x0f172a, 0.95)
-      .setStrokeStyle(2, 0x38bdf8, 0.9)
+    const pauseBtn = this.add.rectangle(45, 45, 44, 44, 0x1e293b, 0.95)
+      .setStrokeStyle(2, 0x0284c7, 0.95)
       .setInteractive({ useHandCursor: true })
       .setDepth(50);
 
     const pauseIcon = this.add.text(45, 45, '⏸', {
       fontFamily: 'Orbitron',
       fontSize: '20px',
-      color: '#00f0ff'
+      color: '#38bdf8'
     }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(51);
 
     pauseBtn.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
@@ -173,41 +173,77 @@ export class GameScene extends Phaser.Scene {
 
     // Sound Mute Toggle Button next to Pause
     const audioMgr = AudioManager.getInstance();
-    const soundBtnBg = this.add.rectangle(105, 45, 44, 44, 0x0f172a, 0.95)
-      .setStrokeStyle(2, 0x38bdf8, 0.9)
+    const isInitiallyMuted = audioMgr.isSoundMuted();
+
+    const soundBtnBg = this.add.rectangle(105, 45, 44, 44, 0x1e293b, 0.95)
+      .setStrokeStyle(2, isInitiallyMuted ? 0xef4444 : 0x0284c7, 0.95)
       .setInteractive({ useHandCursor: true })
       .setDepth(50);
 
-    const soundBtnText = this.add.text(105, 45, audioMgr.isSoundMuted() ? '🔇' : '🔊', {
+    const soundBtnText = this.add.text(105, 45, isInitiallyMuted ? '🔇' : '🔊', {
       fontFamily: 'Orbitron',
       fontSize: '18px',
-      color: '#00f0ff'
+      color: isInitiallyMuted ? '#ef4444' : '#38bdf8'
     }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(51);
 
-    soundBtnBg.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+    // Accessible Tooltip for Sound/Mute Button
+    const tooltipContainer = this.add.container(105, 78).setDepth(60).setVisible(false);
+    const tooltipBg = this.add.graphics();
+    const tooltipText = this.add.text(0, 0, isInitiallyMuted ? 'Unmute sound' : 'Mute sound', {
+      fontFamily: 'Inter',
+      fontSize: '11px',
+      color: '#f8fafc'
+    }).setOrigin(0.5);
+
+    const renderTooltipBg = () => {
+      tooltipBg.clear();
+      const tipW = tooltipText.width + 16;
+      tooltipBg.fillStyle(0x0f172a, 0.95);
+      tooltipBg.lineStyle(1.5, 0x0284c7, 0.9);
+      tooltipBg.fillRoundedRect(-tipW / 2, -12, tipW, 24, 6);
+      tooltipBg.strokeRoundedRect(-tipW / 2, -12, tipW, 24, 6);
+    };
+    renderTooltipBg();
+    tooltipContainer.add([tooltipBg, tooltipText]);
+
+    const showTooltip = () => {
+      tooltipText.setText(audioMgr.isSoundMuted() ? 'Unmute sound' : 'Mute sound');
+      renderTooltipBg();
+      tooltipContainer.setVisible(true);
+      soundBtnBg.setFillStyle(0x334155, 0.98);
+    };
+
+    const hideTooltip = () => {
+      tooltipContainer.setVisible(false);
+      soundBtnBg.setFillStyle(0x1e293b, 0.95);
+    };
+
+    const toggleAudio = (event?: Phaser.Types.Input.EventData) => {
       if (event) event.stopPropagation();
       const muted = audioMgr.toggleMute();
       soundBtnText.setText(muted ? '🔇' : '🔊');
-    });
+      soundBtnText.setColor(muted ? '#ef4444' : '#38bdf8');
+      soundBtnBg.setStrokeStyle(2, muted ? 0xef4444 : 0x0284c7, 0.95);
+      tooltipText.setText(muted ? 'Unmute sound' : 'Mute sound');
+      renderTooltipBg();
+    };
+
+    soundBtnBg.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => toggleAudio(event));
+    soundBtnText.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => toggleAudio(event));
+
+    soundBtnBg.on('pointerover', showTooltip);
+    soundBtnText.on('pointerover', showTooltip);
+    soundBtnBg.on('pointerout', hideTooltip);
+    soundBtnText.on('pointerout', hideTooltip);
 
     // ═══════════════════════════════════════════════════════
-    // 📊 TOP-RIGHT: SCORE, MULTIPLIER & COINS BADGES (Exact Match to Target)
+    // 📊 TOP-RIGHT: SCORE & COINS BADGES (Speed 'x1' Button Removed)
     // ═══════════════════════════════════════════════════════
     const trY = 42;
 
-    // Multiplier Badge 'x1'
-    const multBg = this.add.rectangle(width - 170, trY, 44, 38, 0x0f172a, 0.95)
-      .setStrokeStyle(1.5, 0xf59e0b, 0.85)
-      .setDepth(50);
-    this.add.text(width - 170, trY, 'x1', {
-      fontFamily: 'Orbitron',
-      fontSize: '16px',
-      color: '#f59e0b'
-    }).setOrigin(0.5).setDepth(51);
-
-    // Score Badge '000568'
-    const scoreBg = this.add.rectangle(width - 75, trY, 120, 38, 0x0f172a, 0.95)
-      .setStrokeStyle(1.5, 0xffffff, 0.85)
+    // Score Badge '000000'
+    const scoreBg = this.add.rectangle(width - 75, trY, 120, 38, 0x1e293b, 0.95)
+      .setStrokeStyle(1.5, 0xffffff, 0.9)
       .setDepth(50);
     this.scoreText = this.add.text(width - 75, trY, '000000', {
       fontFamily: 'Orbitron',
@@ -215,23 +251,23 @@ export class GameScene extends Phaser.Scene {
       color: '#ffffff'
     }).setOrigin(0.5).setDepth(51);
 
-    // Coins Badge '18 🪙'
-    const coinBg = this.add.rectangle(width - 75, trY + 44, 120, 34, 0x0f172a, 0.95)
-      .setStrokeStyle(1.5, 0xf59e0b, 0.85)
+    // Coins Badge '0 🪙'
+    const coinBg = this.add.rectangle(width - 75, trY + 44, 120, 34, 0x1e293b, 0.95)
+      .setStrokeStyle(1.5, 0xfacc15, 0.9)
       .setDepth(50);
     this.coinsText = this.add.text(width - 75, trY + 44, '0 🪙', {
       fontFamily: 'Orbitron',
       fontSize: '16px',
-      color: '#f59e0b'
+      color: '#facc15'
     }).setOrigin(0.5).setDepth(51);
 
     // ═══════════════════════════════════════════════════════
-    // ❤️ BOTTOM-LEFT: LIVES CAPSULE BADGE (Exact Match to Target)
+    // ❤️ BOTTOM-LEFT: LIVES CAPSULE BADGE (Daytime Palette)
     // ═══════════════════════════════════════════════════════
     const blY = height - 60;
     const livesBadge = this.add.graphics().setDepth(50);
-    livesBadge.fillStyle(0x0f172a, 0.92);
-    livesBadge.lineStyle(2, 0x38bdf8, 0.9);
+    livesBadge.fillStyle(0x1e293b, 0.95);
+    livesBadge.lineStyle(2, 0x0284c7, 0.95);
     livesBadge.fillRoundedRect(24, blY - 32, 130, 56, 12);
     livesBadge.strokeRoundedRect(24, blY - 32, 130, 56, 12);
 
@@ -245,14 +281,14 @@ export class GameScene extends Phaser.Scene {
     this.updateLivesDisplay();
 
     // ═══════════════════════════════════════════════════════
-    // 🏁 BOTTOM-CENTER: MISSION PROGRESS BAR (Exact Match to Target)
+    // 🏁 BOTTOM-CENTER: MISSION PROGRESS BAR (Daytime Palette)
     // ═══════════════════════════════════════════════════════
     const bcX = width / 2;
     const bcY = height - 42;
 
     const missionCard = this.add.graphics().setDepth(50);
-    missionCard.fillStyle(0x0f172a, 0.92);
-    missionCard.lineStyle(2, 0x00f0ff, 0.9);
+    missionCard.fillStyle(0x1e293b, 0.95);
+    missionCard.lineStyle(2, 0x0284c7, 0.95);
     missionCard.fillRoundedRect(bcX - 190, bcY - 28, 380, 52, 12);
     missionCard.strokeRoundedRect(bcX - 190, bcY - 28, 380, 52, 12);
 
@@ -330,8 +366,8 @@ export class GameScene extends Phaser.Scene {
     const cx = width / 2;
     const cy = height / 2;
 
-    const card = this.add.rectangle(cx, cy, cw, ch, 0x0f172a, 0.96)
-      .setStrokeStyle(2, 0x00f0ff, 0.9);
+    const card = this.add.rectangle(cx, cy, cw, ch, 0x1e293b, 0.96)
+      .setStrokeStyle(2, 0x0284c7, 0.95);
     this.pauseContainer.add(card);
 
     // Header Title

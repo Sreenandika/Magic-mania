@@ -81,36 +81,57 @@ export class TrackEnvironmentManager {
     const horizonY = TrackEnvironmentManager.TOP_Y;
 
     // ═══════════════════════════════════════════════════════
-    // 🏙️ 1. REALISTIC URBAN SKYLINE & ATMOSPHERIC SKY
+    // 🏙️ 1. BRIGHT DAYTIME URBAN SKYLINE & SUNNY SKY WITH CLOUDS
     // ═══════════════════════════════════════════════════════
-    // Upper Sky Gradient
-    this.bgGraphics.fillStyle(0x0f172a, 1);
+    // Bright Daytime Sky Gradient (Vibrant sky blue down to soft horizon haze)
+    this.bgGraphics.fillStyle(0x38bdf8, 1);
     this.bgGraphics.fillRect(0, 0, width, horizonY);
-    this.bgGraphics.fillStyle(0x1e293b, 0.6);
-    this.bgGraphics.fillRect(0, 100, width, horizonY - 100);
+    this.bgGraphics.fillStyle(0x7dd3fc, 0.6);
+    this.bgGraphics.fillRect(0, 60, width, horizonY - 60);
+    this.bgGraphics.fillStyle(0xbae6fd, 0.45);
+    this.bgGraphics.fillRect(0, 130, width, horizonY - 130);
 
-    // Distant Skyscrapers Silhouette
+    // Soft, Subtle Daytime Clouds Drifting Across Horizon
+    const cloudDefs = [
+      { baseX: 80, y: 45, scale: 1.0 },
+      { baseX: 380, y: 70, scale: 0.8 },
+      { baseX: 720, y: 38, scale: 1.15 },
+      { baseX: 1040, y: 62, scale: 0.9 },
+      { baseX: 1220, y: 48, scale: 0.75 }
+    ];
+    cloudDefs.forEach((c) => {
+      const cx = (c.baseX + timeNow * 0.008) % (width + 240) - 120;
+      this.bgGraphics.fillStyle(0xffffff, 0.82);
+      this.bgGraphics.fillEllipse(cx, c.y, 80 * c.scale, 24 * c.scale);
+      this.bgGraphics.fillCircle(cx - 16 * c.scale, c.y - 6 * c.scale, 16 * c.scale);
+      this.bgGraphics.fillCircle(cx + 14 * c.scale, c.y - 8 * c.scale, 20 * c.scale);
+      this.bgGraphics.fillCircle(cx + 34 * c.scale, c.y - 3 * c.scale, 13 * c.scale);
+      // Soft Cloud Shadow Underbelly
+      this.bgGraphics.fillStyle(0xe0f2fe, 0.5);
+      this.bgGraphics.fillEllipse(cx, c.y + 7 * c.scale, 70 * c.scale, 10 * c.scale);
+    });
+
+    // Distant Skyscrapers Silhouette (Soft Sunlit Aerial Perspective)
     const buildingWidths = [60, 85, 50, 95, 70, 55, 90, 75, 110, 60, 80, 65, 90, 70];
     let skyX = 0;
-    this.bgGraphics.fillStyle(0x0a0f1d, 1);
+    this.bgGraphics.fillStyle(0x94a3b8, 0.85); // Hazy daylight skyline
     buildingWidths.forEach((bWidth, idx) => {
       const bHeight = 45 + (idx * 23) % 80;
       this.bgGraphics.fillRect(skyX, horizonY - bHeight - 20, bWidth - 4, bHeight + 20);
       skyX += bWidth;
     });
 
-    // Lit Office Buildings Layer
+    // Daylight Office Buildings Layer
     skyX = 15;
     buildingWidths.forEach((bWidth, idx) => {
       const bHeight = 35 + (idx * 19) % 65;
       const bY = horizonY - bHeight;
 
-      this.bgGraphics.fillStyle(0x1e293b, 1);
+      this.bgGraphics.fillStyle(0x64748b, 1); // Natural architectural slate
       this.bgGraphics.fillRect(skyX, bY, bWidth - 6, bHeight);
 
-      // Windows Grid
-      const isWindowLit = Math.floor(timeNow * 0.0015 + idx) % 2 === 0;
-      this.bgGraphics.fillStyle(0x38bdf8, isWindowLit ? 0.75 : 0.25);
+      // Windows Grid (Daytime Sky Glare Reflections)
+      this.bgGraphics.fillStyle(0xe0f2fe, 0.9);
       for (let wy = bY + 6; wy < horizonY - 6; wy += 10) {
         for (let wx = skyX + 6; wx < skyX + bWidth - 12; wx += 12) {
           if ((wx + wy) % 3 === 0) {
@@ -124,8 +145,8 @@ export class TrackEnvironmentManager {
     // ═══════════════════════════════════════════════════════
     // 🚇 2. OVERHEAD METRO FLYOVER / VIADUCT (Right Side Overhead Rail)
     // ═══════════════════════════════════════════════════════
-    // Heavy Elevated Concrete Beam
-    this.bgGraphics.fillStyle(0x334155, 1);
+    // Clean Concrete Overhead Beam
+    this.bgGraphics.fillStyle(0x64748b, 1);
     this.bgGraphics.beginPath();
     this.bgGraphics.moveTo(760, horizonY - 20);
     this.bgGraphics.lineTo(1280, horizonY - 35);
@@ -134,19 +155,31 @@ export class TrackEnvironmentManager {
     this.bgGraphics.closePath();
     this.bgGraphics.fillPath();
 
+    // Top Sunny Edge Highlight
+    this.bgGraphics.fillStyle(0x94a3b8, 1);
+    this.bgGraphics.beginPath();
+    this.bgGraphics.moveTo(760, horizonY - 20);
+    this.bgGraphics.lineTo(1280, horizonY - 35);
+    this.bgGraphics.lineTo(1280, horizonY - 28);
+    this.bgGraphics.lineTo(760, horizonY - 14);
+    this.bgGraphics.closePath();
+    this.bgGraphics.fillPath();
+
     // Concrete Pillars Supporting Flyover
     for (let px = 820; px < width + 100; px += 180) {
-      this.bgGraphics.fillStyle(0x1e293b, 1);
+      this.bgGraphics.fillStyle(0x64748b, 1);
       this.bgGraphics.fillRect(px, horizonY - 15, 24, 70);
-      this.bgGraphics.fillStyle(0x475569, 1);
+      this.bgGraphics.fillStyle(0x94a3b8, 1); // Sun highlight edge
       this.bgGraphics.fillRect(px + 4, horizonY - 15, 6, 70);
+      this.bgGraphics.fillStyle(0x475569, 1); // Shadow edge
+      this.bgGraphics.fillRect(px + 18, horizonY - 15, 6, 70);
     }
 
     // ═══════════════════════════════════════════════════════
-    // 🛣️ 3. REALISTIC 3-LANE ASPHALT ROAD SURFACE
+    // 🛣️ 3. DAYTIME MEDIUM-LIGHT ASPHALT ROAD SURFACE
     // ═══════════════════════════════════════════════════════
-    // Dark Asphalt Polygon (Trapezoid from Horizon to Foreground)
-    this.bgGraphics.fillStyle(0x1e293b, 1); // Dark Asphalt Grey
+    // Medium-Light Asphalt Gray (Trapezoid from Horizon to Foreground)
+    this.bgGraphics.fillStyle(0x475569, 1); // Medium-Light Asphalt Gray
     this.bgGraphics.beginPath();
     this.bgGraphics.moveTo(500, horizonY);
     this.bgGraphics.lineTo(780, horizonY);
@@ -156,9 +189,9 @@ export class TrackEnvironmentManager {
     this.bgGraphics.fillPath();
 
     // ═══════════════════════════════════════════════════════
-    // 🏙️ 4. CONCRETE SIDEWALKS (Left & Right Boundaries)
+    // 🏙️ 4. LIGHT CONCRETE SIDEWALKS & SURROUNDINGS
     // ═══════════════════════════════════════════════════════
-    this.bgGraphics.fillStyle(0x334155, 1); // Concrete Sidewalk
+    this.bgGraphics.fillStyle(0x94a3b8, 1); // Light Gray Concrete Sidewalk
     // Left Sidewalk
     this.bgGraphics.beginPath();
     this.bgGraphics.moveTo(0, horizonY);
@@ -177,23 +210,27 @@ export class TrackEnvironmentManager {
     this.bgGraphics.closePath();
     this.bgGraphics.fillPath();
 
+    // Subtle Sidewalk Paving Tone Highlight
+    this.bgGraphics.fillStyle(0xcbd5e1, 0.35);
+    this.bgGraphics.fillRect(0, horizonY, width, height - horizonY);
+
     // ═══════════════════════════════════════════════════════
-    // 🚧 5. STEEL GUARDRAILS & ROAD MARGIN CURBS
+    // 🚧 5. STEEL GUARDRAILS & YELLOW/WHITE ROAD MARGIN CURBS
     // ═══════════════════════════════════════════════════════
     // Solid Yellow Outer Road Edges
-    this.bgGraphics.lineStyle(4, 0xeab308, 0.9);
+    this.bgGraphics.lineStyle(4, 0xfacc15, 1);
     this.bgGraphics.lineBetween(500, horizonY, 200, height);
     this.bgGraphics.lineBetween(780, horizonY, 1080, height);
 
     // Solid White Outer Curb Lines
-    this.bgGraphics.lineStyle(3, 0xf8fafc, 0.95);
+    this.bgGraphics.lineStyle(3, 0xffffff, 1);
     this.bgGraphics.lineBetween(510, horizonY, 220, height);
     this.bgGraphics.lineBetween(770, horizonY, 1060, height);
 
     // ═══════════════════════════════════════════════════════
-    // ⚪ 6. WHITE DASHED 3-LANE DIVIDERS (SCROLLING DOWNWARD)
+    // ⚪ 6. CRISP WHITE DASHED 3-LANE DIVIDERS (SCROLLING DOWNWARD)
     // ═══════════════════════════════════════════════════════
-    this.bgGraphics.lineStyle(3.5, 0xf8fafc, 0.95); // Crisp White Road Markings
+    this.bgGraphics.lineStyle(3.5, 0xffffff, 1); // Crisp White Road Markings
 
     // Left/Center Lane Divider Dashed Line
     for (let stepY = horizonY + (this.scrollOffset % 30); stepY < height; stepY += 35) {
@@ -216,7 +253,7 @@ export class TrackEnvironmentManager {
     }
 
     // Steel Guardrail Posts on Sidewalk Edge
-    this.bgGraphics.lineStyle(3, 0x64748b, 0.85);
+    this.bgGraphics.lineStyle(3, 0x94a3b8, 1);
     for (let stepY = horizonY + (this.scrollOffset % 40); stepY < height; stepY += 45) {
       const t = (stepY - horizonY) / (height - horizonY);
       const lX = Phaser.Math.Linear(480, 170, t);
@@ -227,7 +264,7 @@ export class TrackEnvironmentManager {
     }
 
     // Horizontal Steel Rail Cable
-    this.bgGraphics.lineStyle(2, 0x94a3b8, 0.85);
+    this.bgGraphics.lineStyle(2, 0xe2e8f0, 0.95);
     this.bgGraphics.lineBetween(480, horizonY - 8, 170, height - 28);
     this.bgGraphics.lineBetween(800, horizonY - 8, 1110, height - 28);
 

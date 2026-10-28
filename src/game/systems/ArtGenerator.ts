@@ -231,31 +231,39 @@ export class ArtGenerator {
     trainG.generateTexture('obs_train', tw, th);
     trainG.destroy();
 
-    // C. REALISTIC CITY SUV / CAR
+    // C. REALISTIC CITY SUV / CAR (Bright Daytime Red Finish for Maximum Contrast)
     const carG = scene.make.graphics({ x: 0, y: 0 }, false);
-    carG.fillStyle(0x000000, 0.45);
+    carG.fillStyle(0x000000, 0.35);
     carG.fillRoundedRect(2, 48, 84, 14, 6);
 
-    carG.fillStyle(0x1e293b, 1);
+    // Sleek Glossy Red Car Body
+    carG.fillStyle(0xdc2626, 1);
     carG.fillRoundedRect(4, 8, 80, 44, 10);
-    carG.fillStyle(0x334155, 1);
+    carG.fillStyle(0xef4444, 1);
     carG.fillRoundedRect(8, 10, 72, 22, 6);
 
+    // Windshield & Sun Glare
     carG.fillStyle(0x0f172a, 1);
     carG.fillRoundedRect(18, 14, 52, 22, 5);
-    carG.fillStyle(0x38bdf8, 0.4);
+    carG.fillStyle(0x7dd3fc, 0.65);
     carG.fillTriangle(20, 16, 50, 16, 20, 32);
 
-    carG.fillStyle(0xef4444, 1);
+    // Chrome Bumpers & Tail Lights
+    carG.fillStyle(0xe2e8f0, 1);
+    carG.fillRoundedRect(8, 44, 72, 4, 2);
+    carG.fillStyle(0xff0000, 1);
     carG.fillCircle(14, 44, 5);
     carG.fillCircle(74, 44, 5);
+    carG.fillStyle(0xffffff, 0.9);
+    carG.fillCircle(14, 44, 2);
+    carG.fillCircle(74, 44, 2);
 
     carG.generateTexture('obs_car', 88, 64);
     carG.destroy();
 
     // D. CARGO CONTAINER / SHIPPING CRATE
     const crateG = scene.make.graphics({ x: 0, y: 0 }, false);
-    crateG.fillStyle(0x000000, 0.45);
+    crateG.fillStyle(0x000000, 0.35);
     crateG.fillRoundedRect(2, 52, 60, 12, 4);
 
     crateG.fillStyle(0x78350f, 1);
@@ -263,7 +271,7 @@ export class ArtGenerator {
     crateG.fillStyle(0xb45309, 1);
     crateG.fillRoundedRect(8, 8, 48, 44, 4);
 
-    crateG.fillStyle(0x334155, 1);
+    crateG.fillStyle(0x475569, 1);
     crateG.fillRect(4, 4, 10, 10);
     crateG.fillRect(50, 4, 10, 10);
     crateG.fillRect(4, 46, 10, 10);
@@ -278,7 +286,7 @@ export class ArtGenerator {
 
     // E. INDUSTRIAL HAZARD BOMB
     const bombG = scene.make.graphics({ x: 0, y: 0 }, false);
-    bombG.fillStyle(0xef4444, 0.3);
+    bombG.fillStyle(0xef4444, 0.25);
     bombG.fillCircle(24, 24, 22);
 
     bombG.fillStyle(0x991b1b, 1);
@@ -298,23 +306,27 @@ export class ArtGenerator {
 
   // 3. REALISTIC 3D GOLD COINS & POWERUPS
   private static generateItemAndPowerupTextures(scene: Phaser.Scene): void {
-    // Metallic 3D Gold Coin (Exact match to target reference!)
+    // Metallic 3D Gold Coin (High contrast against medium asphalt)
     const coinG = scene.make.graphics({ x: 0, y: 0 }, false);
     const cs = 36;
 
-    // Outer Bevel Edge
+    // Darker Contrast Rim Shadow for Crisp Daytime Road Definition
+    coinG.fillStyle(0x78350f, 1);
+    coinG.fillCircle(18, 18, 18);
+
+    // Outer Bevel Edge & Gold Gradient Fill
     coinG.fillStyle(0xb45309, 1);
-    coinG.fillCircle(18, 18, 17);
+    coinG.fillCircle(18, 18, 16);
     coinG.fillStyle(0xd97706, 1);
-    coinG.fillCircle(18, 18, 15);
+    coinG.fillCircle(18, 18, 14);
     coinG.fillStyle(0xf59e0b, 1);
-    coinG.fillCircle(18, 18, 13);
+    coinG.fillCircle(18, 18, 12);
     coinG.fillStyle(0xfef08a, 1);
     coinG.fillCircle(16, 16, 9);
 
     // Specular Shine Glare
-    coinG.fillStyle(0xffffff, 0.95);
-    coinG.fillCircle(12, 12, 3);
+    coinG.fillStyle(0xffffff, 1);
+    coinG.fillCircle(12, 12, 3.5);
 
     coinG.generateTexture('item_coin', cs, cs);
     coinG.destroy();
@@ -368,42 +380,48 @@ export class ArtGenerator {
     drawOrb('power_boost', 0x15803d, 0x4ade80, 'boost');
   }
 
-  // 4. REALISTIC URBAN CITY ARCHITECTURE & INFRASTRUCTURE PROP TEXTURES
+  // 4. REALISTIC URBAN CITY ARCHITECTURE & INFRASTRUCTURE PROP TEXTURES (DAYTIME)
   private static generateTrackTextures(scene: Phaser.Scene): void {
     const tileG = scene.make.graphics({ x: 0, y: 0 }, false);
-    tileG.fillStyle(0x0f172a, 1);
+    tileG.fillStyle(0x475569, 1);
     tileG.fillRect(0, 0, 1280, 60);
-    tileG.lineStyle(2, 0x00f0ff, 0.4);
+    tileG.lineStyle(2, 0xffffff, 0.5);
     tileG.lineBetween(0, 0, 1280, 0);
     tileG.lineBetween(0, 60, 1280, 60);
     tileG.generateTexture('track_tile', 1280, 60);
     tileG.destroy();
 
-    // 1. REALISTIC 3D GLASS & CONCRETE SKYSCRAPER TOWER
+    // 1. MODERN DAYTIME GLASS & CONCRETE SKYSCRAPER TOWER
     const skyG = scene.make.graphics({ x: 0, y: 0 }, false);
     const sw = 140;
     const sh = 280;
 
-    skyG.fillStyle(0x000000, 0.5);
-    skyG.fillEllipse(70, 272, 120, 20);
+    skyG.fillStyle(0x000000, 0.25);
+    skyG.fillEllipse(70, 272, 120, 18);
 
-    skyG.fillStyle(0x0f172a, 1);
+    // Modern Daylight Slate & Steel Facade
+    skyG.fillStyle(0x475569, 1);
     skyG.fillRect(10, 10, 120, 260);
-    skyG.fillStyle(0x1e293b, 1);
+    skyG.fillStyle(0x64748b, 1); // Sunlit Side
     skyG.fillRect(10, 10, 35, 260);
 
-    skyG.fillStyle(0x38bdf8, 0.6);
+    // Reflective Daytime Sky Glass Windows
     for (let wy = 24; wy < 250; wy += 18) {
       for (let wx = 18; wx < 120; wx += 22) {
+        skyG.fillStyle(0x7dd3fc, 0.85);
         skyG.fillRect(wx, wy, 14, 10);
+        skyG.fillStyle(0xffffff, 0.6); // Sunlight Glint
+        skyG.fillRect(wx + 1, wy + 1, 4, 3);
       }
     }
 
-    skyG.fillStyle(0xfde047, 0.85);
+    // Occasional Warm Tint Office Windows
+    skyG.fillStyle(0xfef08a, 0.8);
     skyG.fillRect(40, 60, 14, 10);
     skyG.fillRect(84, 96, 14, 10);
 
-    skyG.fillStyle(0x475569, 1);
+    // Rooftop Spire & Warning Beacon
+    skyG.fillStyle(0x94a3b8, 1);
     skyG.fillRect(66, 0, 8, 10);
     skyG.fillStyle(0xef4444, 1);
     skyG.fillCircle(70, 2, 4);
@@ -411,101 +429,114 @@ export class ArtGenerator {
     skyG.generateTexture('prop_city_skyscraper', sw, sh);
     skyG.destroy();
 
-    // 2. REALISTIC URBAN APARTMENT & COMMERCIAL BUILDING
+    // 2. DAYTIME URBAN COMMERCIAL APARTMENT BUILDING
     const aptG = scene.make.graphics({ x: 0, y: 0 }, false);
     const aw = 130;
     const ah = 230;
 
-    aptG.fillStyle(0x000000, 0.45);
-    aptG.fillEllipse(65, 224, 110, 18);
+    aptG.fillStyle(0x000000, 0.25);
+    aptG.fillEllipse(65, 224, 110, 16);
 
-    aptG.fillStyle(0x1e293b, 1);
+    // Warm Architectural Gray Body
+    aptG.fillStyle(0x64748b, 1);
     aptG.fillRect(10, 10, 110, 215);
-    aptG.fillStyle(0x334155, 1);
+    aptG.fillStyle(0x94a3b8, 1);
     aptG.fillRect(10, 10, 25, 215);
 
-    aptG.fillStyle(0x00f0ff, 0.35);
+    // Ground Floor Glass Storefront
+    aptG.fillStyle(0x38bdf8, 0.45);
     aptG.fillRect(18, 175, 94, 40);
-    aptG.lineStyle(2, 0x00f0ff, 0.8);
+    aptG.lineStyle(2, 0x0284c7, 0.9);
     aptG.strokeRect(18, 175, 94, 40);
+    // Storefront Awning
+    aptG.fillStyle(0x0284c7, 1);
+    aptG.fillRect(16, 172, 98, 6);
 
-    aptG.fillStyle(0x64748b, 0.7);
+    // Clean Daytime Window Panes
     for (let wy = 22; wy < 160; wy += 24) {
       for (let wx = 22; wx < 105; wx += 26) {
+        aptG.fillStyle(0xbae6fd, 0.9);
         aptG.fillRect(wx, wy, 16, 14);
-        aptG.fillStyle(0x0f172a, 0.9);
-        aptG.fillRect(wx - 2, wy + 10, 20, 4);
-        aptG.fillStyle(0x64748b, 0.7);
+        aptG.fillStyle(0x334155, 1);
+        aptG.fillRect(wx - 2, wy + 11, 20, 3);
+        aptG.fillStyle(0xffffff, 0.6);
+        aptG.fillRect(wx + 2, wy + 2, 5, 4);
       }
     }
 
     aptG.generateTexture('prop_city_apartment', aw, ah);
     aptG.destroy();
 
-    // 3. REALISTIC STEEL STREET LIGHT POLE
+    // 3. REALISTIC DAYLIGHT STEEL STREET LIGHT POLE (Natural unlit daylight fixture)
     const lampG = scene.make.graphics({ x: 0, y: 0 }, false);
     const lw = 60;
     const lh = 180;
 
-    lampG.fillStyle(0x000000, 0.45);
-    lampG.fillEllipse(30, 175, 40, 12);
+    lampG.fillStyle(0x000000, 0.25);
+    lampG.fillEllipse(30, 175, 40, 10);
 
-    lampG.fillStyle(0x475569, 1);
-    lampG.fillRect(26, 150, 8, 25);
+    // Galvanized Steel Base & Pole
     lampG.fillStyle(0x64748b, 1);
+    lampG.fillRect(26, 150, 8, 25);
+    lampG.fillStyle(0x94a3b8, 1);
     lampG.fillRect(28, 10, 4, 145);
 
+    // Steel Luminaire Head Arm
+    lampG.fillStyle(0x64748b, 1);
     lampG.fillRect(28, 10, 22, 4);
-    lampG.fillStyle(0xfde047, 0.95);
-    lampG.fillCircle(48, 15, 7);
-    lampG.fillStyle(0xffffff, 1);
-    lampG.fillCircle(48, 15, 3.5);
+    // Unlit Daylight Luminaire Casing & Frosted Glass Lens
+    lampG.fillStyle(0x475569, 1);
+    lampG.fillRoundedRect(42, 11, 14, 8, 3);
+    lampG.fillStyle(0xe2e8f0, 1); // Clean daylight frosted lens
+    lampG.fillCircle(49, 16, 4.5);
+    lampG.fillStyle(0xffffff, 0.8);
+    lampG.fillCircle(48, 15, 2);
 
     lampG.generateTexture('prop_city_lamppost', lw, lh);
     lampG.destroy();
 
-    // 4. REALISTIC HIGHWAY BILLBOARD SIGN
+    // 4. DAYTIME HIGHWAY BILLBOARD SIGN
     const billG = scene.make.graphics({ x: 0, y: 0 }, false);
     const bw = 130;
     const bh = 150;
 
-    billG.fillStyle(0x334155, 1);
+    billG.fillStyle(0x64748b, 1);
     billG.fillRect(58, 65, 14, 80);
 
-    billG.fillStyle(0x0f172a, 1);
+    billG.fillStyle(0xffffff, 1);
     billG.fillRoundedRect(5, 5, 120, 60, 6);
-    billG.lineStyle(3, 0x00f0ff, 0.9);
+    billG.lineStyle(2, 0x0284c7, 0.9);
     billG.strokeRoundedRect(5, 5, 120, 60, 6);
 
-    billG.fillStyle(0x00f0ff, 0.25);
+    billG.fillStyle(0x0284c7, 1);
     billG.fillRect(10, 10, 110, 50);
-    billG.fillStyle(0xff0077, 0.9);
+    billG.fillStyle(0xfacc15, 1);
     billG.fillRect(20, 22, 70, 8);
-    billG.fillStyle(0xffffff, 0.95);
+    billG.fillStyle(0xffffff, 1);
     billG.fillRect(20, 36, 50, 6);
 
     billG.generateTexture('prop_city_billboard', bw, bh);
     billG.destroy();
 
-    // 5. REALISTIC CONCRETE HIGHWAY JERSEY BARRIER & GUARDRAIL
+    // 5. CLEAN CONCRETE HIGHWAY JERSEY BARRIER & GUARDRAIL
     const cityBarG = scene.make.graphics({ x: 0, y: 0 }, false);
     const jw = 70;
     const jh = 50;
 
-    cityBarG.fillStyle(0x000000, 0.4);
+    cityBarG.fillStyle(0x000000, 0.25);
     cityBarG.fillEllipse(35, 46, 64, 10);
 
-    cityBarG.fillStyle(0x475569, 1);
+    cityBarG.fillStyle(0x94a3b8, 1);
     cityBarG.fillRoundedRect(4, 18, 62, 28, 4);
-    cityBarG.fillStyle(0x64748b, 1);
+    cityBarG.fillStyle(0xcbd5e1, 1);
     cityBarG.fillRoundedRect(6, 20, 58, 14, 3);
 
-    cityBarG.fillStyle(0x94a3b8, 1);
+    cityBarG.fillStyle(0xe2e8f0, 1);
     cityBarG.fillRect(4, 8, 62, 6);
     cityBarG.fillRect(16, 14, 4, 10);
     cityBarG.fillRect(50, 14, 4, 10);
 
-    cityBarG.fillStyle(0xeab308, 0.9);
+    cityBarG.fillStyle(0xfacc15, 1);
     cityBarG.fillRect(20, 24, 10, 18);
     cityBarG.fillRect(40, 24, 10, 18);
 

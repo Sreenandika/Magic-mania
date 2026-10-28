@@ -1,3 +1,5 @@
+import { StorageManager } from '../../storage/localStorage';
+
 export class AudioManager {
   private static instance: AudioManager | null = null;
   private audioCtx: AudioContext | null = null;
@@ -29,6 +31,11 @@ export class AudioManager {
   }
 
   private constructor() {
+    try {
+      this.isMuted = StorageManager.loadProgress().settings?.muted ?? false;
+    } catch {
+      this.isMuted = false;
+    }
     this.setupGlobalUnlockListeners();
   }
 
@@ -307,6 +314,17 @@ export class AudioManager {
     this.initContext();
     if (this.masterGain && this.audioCtx) {
       this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 0.2, this.audioCtx.currentTime);
+    }
+    try {
+      const current = StorageManager.loadProgress();
+      StorageManager.saveProgress({
+        settings: {
+          ...current.settings,
+          muted: this.isMuted
+        }
+      });
+    } catch {
+      // Ignore if localStorage unavailable
     }
     return this.isMuted;
   }

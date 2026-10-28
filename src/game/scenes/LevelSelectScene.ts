@@ -47,9 +47,9 @@ export class LevelSelectScene extends Phaser.Scene {
       fontFamily: 'Orbitron',
       fontSize: '13px',
       color: audioMgr.isSoundMuted() ? '#ef4444' : '#00f0ff'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-    soundBtnBg.on('pointerdown', () => {
+    const handleSoundToggle = () => {
       const muted = audioMgr.toggleMute();
       soundBtnText.setText(muted ? '🔇 MUTED' : '🔊 SOUND');
       soundBtnText.setColor(muted ? '#ef4444' : '#00f0ff');
@@ -57,7 +57,10 @@ export class LevelSelectScene extends Phaser.Scene {
       if (!muted) {
         audioMgr.playCoinSFX();
       }
-    });
+    };
+
+    soundBtnBg.on('pointerdown', handleSoundToggle);
+    soundBtnText.on('pointerdown', handleSoundToggle);
 
     // 3. Render 20 Level Cards Grid (5 columns x 4 rows)
     const cols = 5;
